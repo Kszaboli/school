@@ -49,5 +49,52 @@ namespace school.Controllers
                 return Ok(context.Students.Include(x => x.Mark).ToList());
             }
         }
+
+        [HttpGet("/WithId")]
+        public ActionResult<Student> GetWithId(string id)
+        {
+            if (id != "")
+            {
+                using (var context = new LibraryContext())
+                {
+                    return Ok(context.Students.ToList());
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        public ActionResult<Student> Delete(Guid id)
+        {
+            using (var context = new LibraryContext())
+            {
+                var delStudent = context.Students.FirstOrDefault(y => y.Id == id);
+                if (delStudent != null)
+                {
+                    context.Students.Remove(delStudent);
+                    context.SaveChanges();
+                    return StatusCode(200, delStudent);
+                }
+                return NotFound();
+            }
+        }
+
+        [HttpPut]
+        public ActionResult<Student> Put(Guid id, UpdateStudentDto updateStudentDto)
+        {
+            using (var context = new LibraryContext())
+            {
+                var existingStudent = context.Students.FirstOrDefault(x => x.Id == id);
+                if (existingStudent != null)
+                {
+                    existingStudent.Name = updateStudentDto.Name;
+                    existingStudent.Age = updateStudentDto.Age;
+                    existingStudent.Email = updateStudentDto.Email;
+                    context.SaveChanges();
+                    return StatusCode(200, existingStudent);
+                }
+                return NotFound();
+            }
+        }
     }
 }
